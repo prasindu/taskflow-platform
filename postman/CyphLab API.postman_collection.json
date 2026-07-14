@@ -1,0 +1,905 @@
+{
+  "info": {
+    "_postman_id": "742bc381-14f5-4a92-82b6-940456e56557",
+    "name": "CyphLab API",
+    "description": "StartFragment\n\nThis collection contains all the RESTful API endpoints for the CyphLab platform.\n\n**Key Features Included:**\n\n- **Authentication & RBAC:** Secure login and role-based access control (Admin, PM, Member).\n    \n- **Project Management:** Endpoints to create, update, and manage project details and members.\n    \n- **Task Management:** Complete Kanban-style task workflows with status tracking.\n    \n- **Team Chat:** Real-time project-specific messaging.\n    \n- **Analytics & Audit Logs:** Role-based dashboard stats and system-wide activity tracking.\n    \n\n_Note: Please ensure to log in and set the Bearer Token in the Authorization tab for protected routes._\n\nEndFragment",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "41760967"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Prasindu Deshan\",\r\n  \"email\": \"prasindu@gmail.com\",\r\n  \"password\": \"password123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/auth/register",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "auth",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUxZGE5Y2FhLTdjNjgtNDU1MC1iNTcxLWQ5NTUzMzc4NzEyYiIsImlhdCI6MTc4NDA0ODIxMCwiZXhwIjoxNzg0NjUzMDEwfQ.YnGewW4g4NX5KYJj4Z8Kz_5oyFOlPrUUQZMOnDPBwZg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/auth/me",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "auth",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"admin@gmail.com\",\r\n  \"password\": \"Admin123\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "Get Pending Users",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUxZGE5Y2FhLTdjNjgtNDU1MC1iNTcxLWQ5NTUzMzc4NzEyYiIsImlhdCI6MTc4NDA0ODIxMCwiZXhwIjoxNzg0NjUzMDEwfQ.YnGewW4g4NX5KYJj4Z8Kz_5oyFOlPrUUQZMOnDPBwZg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/users/pending",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "users",
+                "pending"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Users",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUxZGE5Y2FhLTdjNjgtNDU1MC1iNTcxLWQ5NTUzMzc4NzEyYiIsImlhdCI6MTc4NDA0ODIxMCwiZXhwIjoxNzg0NjUzMDEwfQ.YnGewW4g4NX5KYJj4Z8Kz_5oyFOlPrUUQZMOnDPBwZg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/users?approvedOnly=true",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "users"
+              ],
+              "query": [
+                {
+                  "key": "approvedOnly",
+                  "value": "true"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Approve User",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUxZGE5Y2FhLTdjNjgtNDU1MC1iNTcxLWQ5NTUzMzc4NzEyYiIsImlhdCI6MTc4NDA0ODIxMCwiZXhwIjoxNzg0NjUzMDEwfQ.YnGewW4g4NX5KYJj4Z8Kz_5oyFOlPrUUQZMOnDPBwZg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"role\": \"MEMBER\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/users/d5dd6828-0725-4cbb-853b-cb68a314f525/approve",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "users",
+                "d5dd6828-0725-4cbb-853b-cb68a314f525",
+                "approve"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change User Role",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUxZGE5Y2FhLTdjNjgtNDU1MC1iNTcxLWQ5NTUzMzc4NzEyYiIsImlhdCI6MTc4NDA0ODIxMCwiZXhwIjoxNzg0NjUzMDEwfQ.YnGewW4g4NX5KYJj4Z8Kz_5oyFOlPrUUQZMOnDPBwZg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"role\": \"PM\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/users/d5dd6828-0725-4cbb-853b-cb68a314f525/role",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "users",
+                "d5dd6828-0725-4cbb-853b-cb68a314f525",
+                "role"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Project",
+      "item": [
+        {
+          "name": "Create Project",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUxZGE5Y2FhLTdjNjgtNDU1MC1iNTcxLWQ5NTUzMzc4NzEyYiIsImlhdCI6MTc4NDA0ODIxMCwiZXhwIjoxNzg0NjUzMDEwfQ.YnGewW4g4NX5KYJj4Z8Kz_5oyFOlPrUUQZMOnDPBwZg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"Lanka Trails Mobile App\",\r\n  \"description\": \"Develop the initial phase of the travel planner application.\",\r\n  \"deadline\": \"2026-12-31\",\r\n  \"memberIds\": []\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/projects",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "projects"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get All Projects",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUxZGE5Y2FhLTdjNjgtNDU1MC1iNTcxLWQ5NTUzMzc4NzEyYiIsImlhdCI6MTc4NDA0ODIxMCwiZXhwIjoxNzg0NjUzMDEwfQ.YnGewW4g4NX5KYJj4Z8Kz_5oyFOlPrUUQZMOnDPBwZg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/projects",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "projects"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Project By Id",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUxZGE5Y2FhLTdjNjgtNDU1MC1iNTcxLWQ5NTUzMzc4NzEyYiIsImlhdCI6MTc4NDA0ODIxMCwiZXhwIjoxNzg0NjUzMDEwfQ.YnGewW4g4NX5KYJj4Z8Kz_5oyFOlPrUUQZMOnDPBwZg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/projects/2a95e5f6-bff8-427d-9b5d-10e510934031",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "projects",
+                "2a95e5f6-bff8-427d-9b5d-10e510934031"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Project",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUxZGE5Y2FhLTdjNjgtNDU1MC1iNTcxLWQ5NTUzMzc4NzEyYiIsImlhdCI6MTc4NDA0ODIxMCwiZXhwIjoxNzg0NjUzMDEwfQ.YnGewW4g4NX5KYJj4Z8Kz_5oyFOlPrUUQZMOnDPBwZg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"status\": \"ACTIVE\",\r\n  \"description\": \"Phase 2 developments and bug fixing.\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/projects/0d041003-1c00-4342-ac91-0ddc2345c3e2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "projects",
+                "0d041003-1c00-4342-ac91-0ddc2345c3e2"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Add Members to Project",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUxZGE5Y2FhLTdjNjgtNDU1MC1iNTcxLWQ5NTUzMzc4NzEyYiIsImlhdCI6MTc4NDA0ODIxMCwiZXhwIjoxNzg0NjUzMDEwfQ.YnGewW4g4NX5KYJj4Z8Kz_5oyFOlPrUUQZMOnDPBwZg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"memberIds\": [\"d5dd6828-0725-4cbb-853b-cb68a314f525\"] \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/projects/2a95e5f6-bff8-427d-9b5d-10e510934031/members",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "projects",
+                "2a95e5f6-bff8-427d-9b5d-10e510934031",
+                "members"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Member from Project",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUxZGE5Y2FhLTdjNjgtNDU1MC1iNTcxLWQ5NTUzMzc4NzEyYiIsImlhdCI6MTc4NDA0ODIxMCwiZXhwIjoxNzg0NjUzMDEwfQ.YnGewW4g4NX5KYJj4Z8Kz_5oyFOlPrUUQZMOnDPBwZg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/projects/0d041003-1c00-4342-ac91-0ddc2345c3e2/members/d5dd6828-0725-4cbb-853b-cb68a314f525",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "projects",
+                "0d041003-1c00-4342-ac91-0ddc2345c3e2",
+                "members",
+                "d5dd6828-0725-4cbb-853b-cb68a314f525"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Project",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUxZGE5Y2FhLTdjNjgtNDU1MC1iNTcxLWQ5NTUzMzc4NzEyYiIsImlhdCI6MTc4NDA0ODIxMCwiZXhwIjoxNzg0NjUzMDEwfQ.YnGewW4g4NX5KYJj4Z8Kz_5oyFOlPrUUQZMOnDPBwZg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/projects/0d041003-1c00-4342-ac91-0ddc2345c3e2",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "projects",
+                "0d041003-1c00-4342-ac91-0ddc2345c3e2"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "Create Task",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUxZGE5Y2FhLTdjNjgtNDU1MC1iNTcxLWQ5NTUzMzc4NzEyYiIsImlhdCI6MTc4NDA0ODIxMCwiZXhwIjoxNzg0NjUzMDEwfQ.YnGewW4g4NX5KYJj4Z8Kz_5oyFOlPrUUQZMOnDPBwZg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Design Login Screen\",\r\n  \"description\": \"Create the UI for the login page using Next.js and Tailwind.\",\r\n  \"priority\": \"HIGH\",\r\n  \"deadline\": \"2026-08-01\",\r\n  \"assigneeId\": \"e1da9caa-7c68-4550-b571-d9553378712b\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/projects/2a95e5f6-bff8-427d-9b5d-10e510934031/tasks",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "projects",
+                "2a95e5f6-bff8-427d-9b5d-10e510934031",
+                "tasks"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Project Tasks",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUxZGE5Y2FhLTdjNjgtNDU1MC1iNTcxLWQ5NTUzMzc4NzEyYiIsImlhdCI6MTc4NDA0ODIxMCwiZXhwIjoxNzg0NjUzMDEwfQ.YnGewW4g4NX5KYJj4Z8Kz_5oyFOlPrUUQZMOnDPBwZg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/projects/2a95e5f6-bff8-427d-9b5d-10e510934031/tasks",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "projects",
+                "2a95e5f6-bff8-427d-9b5d-10e510934031",
+                "tasks"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Tasks",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUxZGE5Y2FhLTdjNjgtNDU1MC1iNTcxLWQ5NTUzMzc4NzEyYiIsImlhdCI6MTc4NDA0ODIxMCwiZXhwIjoxNzg0NjUzMDEwfQ.YnGewW4g4NX5KYJj4Z8Kz_5oyFOlPrUUQZMOnDPBwZg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/tasks/my",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "tasks",
+                "my"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Task",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUxZGE5Y2FhLTdjNjgtNDU1MC1iNTcxLWQ5NTUzMzc4NzEyYiIsImlhdCI6MTc4NDA0ODIxMCwiZXhwIjoxNzg0NjUzMDEwfQ.YnGewW4g4NX5KYJj4Z8Kz_5oyFOlPrUUQZMOnDPBwZg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"title\": \"Design Login and Register Screens\",\r\n  \"priority\": \"MEDIUM\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/tasks/b27c18e9-fc63-46fa-ba1a-d4bf2d8095d8",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "tasks",
+                "b27c18e9-fc63-46fa-ba1a-d4bf2d8095d8"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Task Status",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUxZGE5Y2FhLTdjNjgtNDU1MC1iNTcxLWQ5NTUzMzc4NzEyYiIsImlhdCI6MTc4NDA0ODIxMCwiZXhwIjoxNzg0NjUzMDEwfQ.YnGewW4g4NX5KYJj4Z8Kz_5oyFOlPrUUQZMOnDPBwZg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"status\": \"IN_PROGRESS\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/tasks/b27c18e9-fc63-46fa-ba1a-d4bf2d8095d8/status",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "tasks",
+                "b27c18e9-fc63-46fa-ba1a-d4bf2d8095d8",
+                "status"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Task",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUxZGE5Y2FhLTdjNjgtNDU1MC1iNTcxLWQ5NTUzMzc4NzEyYiIsImlhdCI6MTc4NDA0ODIxMCwiZXhwIjoxNzg0NjUzMDEwfQ.YnGewW4g4NX5KYJj4Z8Kz_5oyFOlPrUUQZMOnDPBwZg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/tasks/a9e8de5b-f079-4d20-a69d-ec0913681a6c",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "tasks",
+                "a9e8de5b-f079-4d20-a69d-ec0913681a6c"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Chat",
+      "item": [
+        {
+          "name": "Send Message",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUxZGE5Y2FhLTdjNjgtNDU1MC1iNTcxLWQ5NTUzMzc4NzEyYiIsImlhdCI6MTc4NDA0ODIxMCwiZXhwIjoxNzg0NjUzMDEwfQ.YnGewW4g4NX5KYJj4Z8Kz_5oyFOlPrUUQZMOnDPBwZg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"content\": \"Hello team, let's start the development phase!\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5000/api/projects/2a95e5f6-bff8-427d-9b5d-10e510934031/messages",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "projects",
+                "2a95e5f6-bff8-427d-9b5d-10e510934031",
+                "messages"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Project Messages",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUxZGE5Y2FhLTdjNjgtNDU1MC1iNTcxLWQ5NTUzMzc4NzEyYiIsImlhdCI6MTc4NDA0ODIxMCwiZXhwIjoxNzg0NjUzMDEwfQ.YnGewW4g4NX5KYJj4Z8Kz_5oyFOlPrUUQZMOnDPBwZg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/projects/2a95e5f6-bff8-427d-9b5d-10e510934031/messages",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "projects",
+                "2a95e5f6-bff8-427d-9b5d-10e510934031",
+                "messages"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Activities",
+      "item": [
+        {
+          "name": "Get All Activities",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUxZGE5Y2FhLTdjNjgtNDU1MC1iNTcxLWQ5NTUzMzc4NzEyYiIsImlhdCI6MTc4NDA0ODIxMCwiZXhwIjoxNzg0NjUzMDEwfQ.YnGewW4g4NX5KYJj4Z8Kz_5oyFOlPrUUQZMOnDPBwZg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/activities",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "activities"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "Get Dashboard Stats",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImUxZGE5Y2FhLTdjNjgtNDU1MC1iNTcxLWQ5NTUzMzc4NzEyYiIsImlhdCI6MTc4NDA0ODIxMCwiZXhwIjoxNzg0NjUzMDEwfQ.YnGewW4g4NX5KYJj4Z8Kz_5oyFOlPrUUQZMOnDPBwZg",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/analytics",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "analytics"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "General",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5000/api/health",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5000",
+              "path": [
+                "api",
+                "health"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

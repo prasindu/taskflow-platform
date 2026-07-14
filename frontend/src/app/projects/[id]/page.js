@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import AppShell from "@/components/AppShell";
 import { useAuth } from "@/context/AuthContext";
 import api from "@/lib/api";
-import { LayoutList, Users, MessageSquare, Plus, X, Send, Clock, CheckCircle2, Circle, Lock, Trash2, AlertTriangle } from "lucide-react";
+import { LayoutList, Users, MessageSquare, Plus, X, Send, Clock, CheckCircle2, Circle, Lock, Trash2, AlertTriangle, Pencil, UserPlus } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 export default function ProjectDetailPage() {
@@ -23,6 +23,19 @@ export default function ProjectDetailPage() {
   const [deleteError, setDeleteError] = useState("");
 
   const [taskForm, setTaskForm] = useState({ title: "", description: "", priority: "MEDIUM", assigneeId: "" });
+
+  // Task edit
+  const [showEditTaskModal, setShowEditTaskModal] = useState(false);
+  const [editingTaskId, setEditingTaskId] = useState(null);
+  const [editTaskForm, setEditTaskForm] = useState({ title: "", description: "", priority: "MEDIUM", assigneeId: "" });
+  const [savingEditTask, setSavingEditTask] = useState(false);
+
+  // Add members to project
+  const [showAddMemberModal, setShowAddMemberModal] = useState(false);
+  const [allMembers, setAllMembers] = useState([]);
+  const [selectedMemberIds, setSelectedMemberIds] = useState([]);
+  const [loadingMembers, setLoadingMembers] = useState(false);
+  const [savingMembers, setSavingMembers] = useState(false);
 
   const messagesEndRef = useRef(null);
 
@@ -68,7 +81,7 @@ export default function ProjectDetailPage() {
 
   const createTask = async (e) => {
     e.preventDefault();
-    if (!isActive) return; // Backend එකට යන්න කලින් මෙතනිනුත් block කරනවා
+    if (!isActive) return; 
     await api.post(`/projects/${id}/tasks`, {
       title: taskForm.title,
       description: taskForm.description,
@@ -81,14 +94,47 @@ export default function ProjectDetailPage() {
   };
 
   const updateStatus = async (taskId, status) => {
-    if (!isActive) return; // Active නැත්නම් block කරනවා
+    if (!isActive) return; 
     await api.patch(`/tasks/${taskId}/status`, { status });
     load();
   };
 
+  // Task edit
+  const openEditTask = (t) => {
+    setEditingTaskId(t.id);
+    setEditTaskForm({
+      title: t.title || "",
+      description: t.description || "",
+      priority: t.priority || "MEDIUM",
+      assigneeId: t.assignee?.id || "",
+    });
+    setShowEditTaskModal(true);
+  };
+
+  const submitEditTask = async (e) => {
+    e.preventDefault();
+    if (!editingTaskId) return;
+    setSavingEditTask(true);
+    try {
+      await api.put(`/tasks/${editingTaskId}`, {
+        title: editTaskForm.title,
+        description: editTaskForm.description,
+        priority: editTaskForm.priority,
+        assigneeId: editTaskForm.assigneeId || null,
+      });
+      setShowEditTaskModal(false);
+      setEditingTaskId(null);
+      load();
+    } catch (error) {
+      console.error("Failed to update task:", error);
+    } finally {
+      setSavingEditTask(false);
+    }
+  };
+
   const sendMessage = async (e) => {
     e.preventDefault();
-    if (!chatInput.trim() || !isActive) return; // Active නැත්නම් block කරනවා
+    if (!chatInput.trim() || !isActive) return; 
     const { data } = await api.post(`/projects/${id}/messages`, { content: chatInput });
     setMessages((m) => [...m, data]);
     setChatInput("");
@@ -106,6 +152,46 @@ export default function ProjectDetailPage() {
       setDeleting(false);
     }
   };
+
+  // Add members
+  const openAddMemberModal = async () => {
+    setShowAddMemberModal(true);
+    setSelectedMemberIds([]);
+    setLoadingMembers(true);
+    try {
+      const res = await api.get("/users?approvedOnly=true");
+      setAllMembers(res.data);
+    } catch (error) {
+      console.error("Failed to load users:", error);
+    } finally {
+      setLoadingMembers(false);
+    }
+  };
+
+  const toggleSelectedMember = (userId) => {
+    setSelectedMemberIds((ids) =>
+      ids.includes(userId) ? ids.filter((i) => i !== userId) : [...ids, userId]
+    );
+  };
+
+  const submitAddMembers = async (e) => {
+    e.preventDefault();
+    if (selectedMemberIds.length === 0) return;
+    setSavingMembers(true);
+    try {
+      await api.post(`/projects/${id}/members`, { memberIds: selectedMemberIds });
+      setShowAddMemberModal(false);
+      setSelectedMemberIds([]);
+      load();
+    } catch (error) {
+      console.error("Failed to add members:", error);
+    } finally {
+      setSavingMembers(false);
+    }
+  };
+
+  const existingMemberIds = new Set((project?.members || []).map((m) => m.user.id));
+  const addableMembers = allMembers.filter((m) => !existingMemberIds.has(m.id));
 
   const getInitials = (name) => name?.substring(0, 2).toUpperCase() || "U";
 
@@ -228,6 +314,15 @@ export default function ProjectDetailPage() {
                       <span className={`shrink-0 text-[10px] px-2 py-1 rounded font-bold tracking-wider ${priorityStyles(t.priority)}`}>
                         {t.priority}
                       </span>
+                      {canManage && (
+                        <button
+                          onClick={() => openEditTask(t)}
+                          className="shrink-0 text-[var(--text-dim)] hover:text-[var(--teal)] transition-colors p-1 -mr-1"
+                          aria-label="Edit task"
+                        >
+                          <Pencil size={15} />
+                        </button>
+                      )}
                     </div>
                     <div className="flex items-center justify-between gap-3 pl-8">
                       <div className="flex items-center gap-2 min-w-0">
@@ -262,6 +357,7 @@ export default function ProjectDetailPage() {
                       <th className="px-5 py-4 font-medium">Assignee</th>
                       <th className="px-5 py-4 font-medium">Priority</th>
                       <th className="px-5 py-4 font-medium w-40">Status</th>
+                      <th className="px-5 py-4 font-medium w-14"></th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-[var(--border)] bg-[var(--bg)]">
@@ -312,6 +408,18 @@ export default function ProjectDetailPage() {
                             <option value="DONE" className="text-[var(--text)] bg-[var(--bg-panel)]">DONE</option>
                           </select>
                         </td>
+
+                        <td className="px-5 py-4 text-right">
+                          {canManage && (
+                            <button
+                              onClick={() => openEditTask(t)}
+                              className="text-[var(--text-dim)] hover:text-[var(--teal)] transition-colors p-1.5 rounded-md hover:bg-[var(--bg-panel-hover)]"
+                              aria-label="Edit task"
+                            >
+                              <Pencil size={15} />
+                            </button>
+                          )}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -325,9 +433,16 @@ export default function ProjectDetailPage() {
       {/* Team Members Tab */}
       {tab === "members" && (
         <div className="panel p-0 overflow-hidden max-w-2xl border-[var(--border)]">
-          <div className="p-4 border-b border-[var(--border)] bg-[var(--bg-panel)] flex items-center gap-2">
-            <Users size={18} className="text-[var(--teal)]" />
-            <h3 className="font-semibold">Project Team ({project.members.length})</h3>
+          <div className="p-4 border-b border-[var(--border)] bg-[var(--bg-panel)] flex justify-between items-center">
+            <div className="flex items-center gap-2">
+              <Users size={18} className="text-[var(--teal)]" />
+              <h3 className="font-semibold">Project Team ({project.members.length})</h3>
+            </div>
+            {canManage && (
+              <button onClick={openAddMemberModal} className="btn-primary py-1.5 px-3 sm:px-4 text-xs flex items-center gap-2">
+                <UserPlus size={14} /> <span className="hidden sm:inline">Add Members</span>
+              </button>
+            )}
           </div>
           <div className="divide-y divide-[var(--border)]">
             {project.members.map((m) => (
@@ -447,6 +562,100 @@ export default function ProjectDetailPage() {
               <div className="flex gap-3 pt-4 border-t border-[var(--border)] mt-4">
                 <button type="button" onClick={() => setShowTaskModal(false)} className="btn-secondary flex-1">Cancel</button>
                 <button type="submit" className="btn-primary flex-1">Create Task</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* EDIT TASK MODAL */}
+      {showEditTaskModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center sm:p-4 z-50 animate-in fade-in duration-200">
+          <div className="panel w-full sm:max-w-md p-0 overflow-hidden shadow-2xl border-[var(--border)] rounded-b-none sm:rounded-b-xl animate-in zoom-in-95 duration-200 max-h-[92vh] flex flex-col">
+            <div className="flex items-center justify-between p-5 border-b border-[var(--border)] bg-[var(--bg)] shrink-0">
+              <h2 className="font-display text-lg font-semibold flex items-center gap-2"><Pencil size={18} className="text-[var(--teal)]"/> Edit Task</h2>
+              <button onClick={() => setShowEditTaskModal(false)} className="text-[var(--text-dim)] hover:text-white transition-colors"><X size={20}/></button>
+            </div>
+
+            <form onSubmit={submitEditTask} className="p-6 space-y-4 overflow-y-auto">
+              <div>
+                <label className="text-xs font-bold text-[var(--text-dim)] tracking-wider mb-1 block">TASK TITLE</label>
+                <input required placeholder="E.g. Setup Database" className="input-field" value={editTaskForm.title} onChange={(e) => setEditTaskForm({ ...editTaskForm, title: e.target.value })} />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-[var(--text-dim)] tracking-wider mb-1 block">DESCRIPTION</label>
+                <textarea placeholder="Add details..." className="input-field resize-none" rows={3} value={editTaskForm.description} onChange={(e) => setEditTaskForm({ ...editTaskForm, description: e.target.value })} />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="col-span-2">
+                  <label className="text-xs font-bold text-[var(--text-dim)] tracking-wider mb-1 block">PRIORITY</label>
+                  <select className="input-field" value={editTaskForm.priority} onChange={(e) => setEditTaskForm({ ...editTaskForm, priority: e.target.value })}>
+                    <option value="LOW">Low</option>
+                    <option value="MEDIUM">Medium</option>
+                    <option value="HIGH">High</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-bold text-[var(--text-dim)] tracking-wider mb-1 block">ASSIGNEE</label>
+                <select className="input-field" value={editTaskForm.assigneeId} onChange={(e) => setEditTaskForm({ ...editTaskForm, assigneeId: e.target.value })}>
+                  <option value="">Unassigned</option>
+                  <option value="unassigned_spacer" disabled>──────────</option>
+                  {project.members.map((m) => (
+                    <option key={m.user.id} value={m.user.id}>{m.user.name}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="flex gap-3 pt-4 border-t border-[var(--border)] mt-4">
+                <button type="button" onClick={() => setShowEditTaskModal(false)} className="btn-secondary flex-1" disabled={savingEditTask}>Cancel</button>
+                <button type="submit" className="btn-primary flex-1" disabled={savingEditTask}>{savingEditTask ? "Saving..." : "Save Changes"}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ADD MEMBERS MODAL */}
+      {showAddMemberModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center sm:p-4 z-50 animate-in fade-in duration-200">
+          <div className="panel w-full sm:max-w-md p-0 overflow-hidden shadow-2xl border-[var(--border)] rounded-b-none sm:rounded-b-xl animate-in zoom-in-95 duration-200 max-h-[92vh] flex flex-col">
+            <div className="flex items-center justify-between p-5 border-b border-[var(--border)] bg-[var(--bg)] shrink-0">
+              <h2 className="font-display text-lg font-semibold flex items-center gap-2"><UserPlus size={20} className="text-[var(--teal)]"/> Add Team Members</h2>
+              <button onClick={() => setShowAddMemberModal(false)} className="text-[var(--text-dim)] hover:text-white transition-colors"><X size={20}/></button>
+            </div>
+
+            <form onSubmit={submitAddMembers} className="p-6 space-y-4 overflow-y-auto">
+              {loadingMembers ? (
+                <p className="text-sm text-[var(--text-dim)] text-center py-6">Loading users...</p>
+              ) : addableMembers.length === 0 ? (
+                <p className="text-sm text-[var(--text-dim)] text-center py-6">Everyone available is already on this project.</p>
+              ) : (
+                <div className="max-h-64 overflow-y-auto border border-[var(--border)] rounded-lg bg-[var(--bg)] divide-y divide-[var(--border)]">
+                  {addableMembers.map((m) => (
+                    <label key={m.id} className="flex items-center gap-3 p-3 hover:bg-[var(--bg-panel-hover)] cursor-pointer transition-colors">
+                      <input
+                        type="checkbox"
+                        className="w-4 h-4 rounded border-[var(--border)] text-[var(--teal)] focus:ring-[var(--teal)] bg-[var(--bg-panel)]"
+                        checked={selectedMemberIds.includes(m.id)}
+                        onChange={() => toggleSelectedMember(m.id)}
+                      />
+                      <div className="w-8 h-8 rounded-full bg-[var(--bg-panel)] border border-[var(--border)] flex items-center justify-center text-xs font-bold shrink-0">{getInitials(m.name)}</div>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{m.name}</p>
+                        <p className="text-[10px] text-[var(--text-dim)] uppercase tracking-wider">{m.role || "Member"}</p>
+                      </div>
+                    </label>
+                  ))}
+                </div>
+              )}
+
+              <div className="flex gap-3 pt-4 border-t border-[var(--border)] mt-4">
+                <button type="button" onClick={() => setShowAddMemberModal(false)} className="btn-secondary flex-1" disabled={savingMembers}>Cancel</button>
+                <button type="submit" className="btn-primary flex-1" disabled={savingMembers || selectedMemberIds.length === 0}>
+                  {savingMembers ? "Adding..." : `Add ${selectedMemberIds.length || ""}`.trim()}
+                </button>
               </div>
             </form>
           </div>
