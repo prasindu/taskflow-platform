@@ -5,7 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import AppShell from "@/components/AppShell";
 import { useAuth } from "@/context/AuthContext";
 import api from "@/lib/api";
-import { LayoutList, Users, MessageSquare, Plus, X, Send, Clock, CheckCircle2, Circle, Lock } from "lucide-react";
+import { LayoutList, Users, MessageSquare, Plus, X, Send, Clock, CheckCircle2, Circle, Lock, Trash2, AlertTriangle } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 
 export default function ProjectDetailPage() {
@@ -18,12 +18,17 @@ export default function ProjectDetailPage() {
   const [messages, setMessages] = useState([]);
   const [chatInput, setChatInput] = useState("");
   const [showTaskModal, setShowTaskModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
 
   const [taskForm, setTaskForm] = useState({ title: "", description: "", priority: "MEDIUM", assigneeId: "" });
 
   const messagesEndRef = useRef(null);
 
   const canManage = user && (user.role === "ADMIN" || (user.role === "PM" && project?.createdById === user.id));
+  // Only ADMIN can delete a project — PMs can manage but not delete
+  const canDelete = user && user.role === "ADMIN";
 
   const isActive = project?.status === 'ACTIVE';
 
@@ -90,6 +95,18 @@ export default function ProjectDetailPage() {
     setTimeout(() => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" }), 100);
   };
 
+  const deleteProject = async () => {
+    setDeleting(true);
+    setDeleteError("");
+    try {
+      await api.delete(`/projects/${id}`);
+      router.push("/projects");
+    } catch (error) {
+      setDeleteError(error.response?.data?.message || "Failed to delete project. Please try again.");
+      setDeleting(false);
+    }
+  };
+
   const getInitials = (name) => name?.substring(0, 2).toUpperCase() || "U";
 
   const priorityStyles = (priority) =>
@@ -109,31 +126,42 @@ export default function ProjectDetailPage() {
     <AppShell>
       {/* HEADER */}
       <div className="mb-6 sm:mb-8">
-        <div className="flex flex-wrap items-center gap-3 mb-2">
-          {canManage ? (
-            <select
-              value={project.status}
-              onChange={(e) => updateProjectStatus(e.target.value)}
-              className={`px-2 py-1 rounded text-xs font-bold tracking-wider border focus:outline-none cursor-pointer appearance-none ${
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-2">
+          <div className="flex flex-wrap items-center gap-3">
+            {canManage ? (
+              <select
+                value={project.status}
+                onChange={(e) => updateProjectStatus(e.target.value)}
+                className={`px-2 py-1 rounded text-xs font-bold tracking-wider border focus:outline-none cursor-pointer appearance-none ${
+                  project.status === 'ACTIVE' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
+                  project.status === 'COMPLETED' ? 'bg-[var(--gold)]/10 text-[var(--gold)] border-[var(--gold)]/20' :
+                  'bg-gray-500/10 text-gray-400 border-gray-500/20'
+                }`}
+              >
+                <option value="PLANNING" className="text-[var(--text)] bg-[var(--bg-panel)]">PLANNING</option>
+                <option value="ACTIVE" className="text-[var(--text)] bg-[var(--bg-panel)]">ACTIVE</option>
+                <option value="COMPLETED" className="text-[var(--text)] bg-[var(--bg-panel)]">COMPLETED</option>
+              </select>
+            ) : (
+              <span className={`px-2 py-1 rounded text-[10px] font-bold tracking-wider border ${
                 project.status === 'ACTIVE' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
                 project.status === 'COMPLETED' ? 'bg-[var(--gold)]/10 text-[var(--gold)] border-[var(--gold)]/20' :
                 'bg-gray-500/10 text-gray-400 border-gray-500/20'
-              }`}
+              }`}>
+                {project.status}
+              </span>
+            )}
+            {project.deadline && <span className="text-xs text-[var(--text-dim)] flex items-center gap-1"><Clock size={12}/> Due {new Date(project.deadline).toLocaleDateString()}</span>}
+          </div>
+
+          {canDelete && (
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-md border border-red-500/20 text-red-500 hover:bg-red-500/10 transition-colors"
             >
-              <option value="PLANNING" className="text-[var(--text)] bg-[var(--bg-panel)]">PLANNING</option>
-              <option value="ACTIVE" className="text-[var(--text)] bg-[var(--bg-panel)]">ACTIVE</option>
-              <option value="COMPLETED" className="text-[var(--text)] bg-[var(--bg-panel)]">COMPLETED</option>
-            </select>
-          ) : (
-            <span className={`px-2 py-1 rounded text-[10px] font-bold tracking-wider border ${
-              project.status === 'ACTIVE' ? 'bg-blue-500/10 text-blue-500 border-blue-500/20' :
-              project.status === 'COMPLETED' ? 'bg-[var(--gold)]/10 text-[var(--gold)] border-[var(--gold)]/20' :
-              'bg-gray-500/10 text-gray-400 border-gray-500/20'
-            }`}>
-              {project.status}
-            </span>
+              <Trash2 size={14} /> Delete Project
+            </button>
           )}
-          {project.deadline && <span className="text-xs text-[var(--text-dim)] flex items-center gap-1"><Clock size={12}/> Due {new Date(project.deadline).toLocaleDateString()}</span>}
         </div>
         <h1 className="font-display text-2xl sm:text-3xl font-bold">{project.name}</h1>
         <p className="text-[var(--text-dim)] mt-2 max-w-3xl leading-relaxed text-sm sm:text-base">{project.description || "No project description available."}</p>
@@ -421,6 +449,47 @@ export default function ProjectDetailPage() {
                 <button type="submit" className="btn-primary flex-1">Create Task</button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* DELETE PROJECT CONFIRM MODAL */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center sm:p-4 z-50 animate-in fade-in duration-200">
+          <div className="panel w-full sm:max-w-sm p-0 overflow-hidden shadow-2xl border-red-500/30 rounded-b-none sm:rounded-b-xl animate-in zoom-in-95 duration-200">
+            <div className="p-6 text-center">
+              <div className="mx-auto w-12 h-12 rounded-full bg-red-500/10 flex items-center justify-center mb-4">
+                <AlertTriangle size={22} className="text-red-500" />
+              </div>
+              <h2 className="font-display text-lg font-semibold mb-2">Delete this project?</h2>
+              <p className="text-sm text-[var(--text-dim)] mb-1">
+                This will permanently delete <strong className="text-[var(--text)]">{project.name}</strong>, along with all its tasks, members, and chat messages.
+              </p>
+              <p className="text-sm text-red-500 mb-5">This action cannot be undone.</p>
+
+              {deleteError && (
+                <p className="text-xs text-red-500 mb-3">{deleteError}</p>
+              )}
+
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={() => { setShowDeleteModal(false); setDeleteError(""); }}
+                  disabled={deleting}
+                  className="btn-secondary flex-1"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={deleteProject}
+                  disabled={deleting}
+                  className="flex-1 rounded-lg bg-red-500 hover:bg-red-600 text-white font-semibold py-2.5 transition-colors disabled:opacity-50"
+                >
+                  {deleting ? "Deleting..." : "Delete"}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
