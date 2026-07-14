@@ -124,7 +124,7 @@ export default function RegisterPage() {
               <div>
                 <label className="text-xs text-[var(--text-dim)] font-mono tracking-wide">FULL NAME</label>
                 <div className="relative mt-1.5">
-                  <User size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-dim)]" />
+                  
                   <input
                     required
                     placeholder="Jane Perera"
@@ -137,7 +137,7 @@ export default function RegisterPage() {
               <div>
                 <label className="text-xs text-[var(--text-dim)] font-mono tracking-wide">EMAIL</label>
                 <div className="relative mt-1.5">
-                  <Mail size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-dim)]" />
+                  
                   <input
                     type="email"
                     required
@@ -151,7 +151,7 @@ export default function RegisterPage() {
               <div>
                 <label className="text-xs text-[var(--text-dim)] font-mono tracking-wide">PASSWORD</label>
                 <div className="relative mt-1.5">
-                  <Lock size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--text-dim)]" />
+                  
                   <input
                     type="password"
                     required
