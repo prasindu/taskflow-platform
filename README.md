@@ -123,7 +123,7 @@ npm run dev          # starts the app on http://localhost:3000
 
 ## 🔌 API Documentation
 
-Full request/response reference is provided as a Postman collection: [`postman/CyphLab.postman_collection.json`](./postman/CyphLab.postman_collection.json).
+Full request/response reference is provided as a Postman collection: [`postman/CyphLab API.postman_collection.json`](./postman/CyphLab API.postman_collection.json).
 
 Import it into Postman, set the `baseUrl` variable (default `http://localhost:5000/api`), log in via `/auth/login` to get a token, and set it as the `token` collection variable — all other requests use it automatically via Bearer auth.
 
@@ -157,7 +157,7 @@ All AI-generated code was reviewed, tested, and extended manually — including 
 
 ## 📹 Demo Video
 
-*()*
+*(https://drive.google.com/file/d/1JjA9f1J-CdeafORCgL9Oth9PfJn9wNed/view?usp=sharing)*
 
 ## 🌐 Live Deployment
 
