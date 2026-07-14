@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import AppShell from "@/components/AppShell";
 import { useAuth } from "@/context/AuthContext";
@@ -15,6 +15,15 @@ export default function ProjectsPage() {
   const [form, setForm] = useState({ name: "", description: "", deadline: "", memberIds: [] });
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const deadlineRef = useRef(null);
+
+  const openDatePicker = () => {
+    if (deadlineRef.current?.showPicker) {
+      deadlineRef.current.showPicker();
+    } else {
+      deadlineRef.current?.focus();
+    }
+  };
 
   const loadProjects = async () => {
     setLoading(true);
@@ -149,7 +158,20 @@ export default function ProjectsPage() {
               </div>
               <div>
                 <label className="text-xs font-bold text-[var(--text-dim)] tracking-wider mb-1.5 block">DEADLINE</label>
-                <input type="date" className="input-field" value={form.deadline} onChange={(e) => setForm({ ...form, deadline: e.target.value })} />
+                <div className="relative cursor-pointer" onClick={openDatePicker}>
+                  <input
+                    ref={deadlineRef}
+                    type="date"
+                    className="input-field pr-10 cursor-pointer"
+                    style={{ colorScheme: "dark" }}
+                    value={form.deadline}
+                    onChange={(e) => setForm({ ...form, deadline: e.target.value })}
+                  />
+                  <Calendar
+                    size={16}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-[var(--text-dim)] pointer-events-none"
+                  />
+                </div>
               </div>
               <div>
                 <label className="text-xs font-bold text-[var(--text-dim)] tracking-wider mb-1.5 block flex items-center gap-2"><Users size={14}/> ASSIGN TEAM MEMBERS</label>
