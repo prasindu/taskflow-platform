@@ -1,0 +1,263 @@
+{
+  "info": {
+    "name": "CyphLab - Project & Team Task Management",
+    "description": "API collection for the CyphLab Project & Team Task Management Platform. Set `baseUrl` and `token` collection variables. Login first to get the token.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:5000/api" },
+    { "key": "token", "value": "" },
+    { "key": "userId", "value": "" },
+    { "key": "projectId", "value": "" },
+    { "key": "taskId", "value": "" }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [{ "key": "token", "value": "{{token}}", "type": "string" }]
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Kasun Perera\",\n  \"email\": \"kasun@example.com\",\n  \"password\": \"Password123\"\n}"
+            },
+            "auth": { "type": "noauth" }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const data = pm.response.json();",
+                  "if (data.token) { pm.collectionVariables.set('token', data.token); }",
+                  "if (data.user) { pm.collectionVariables.set('userId', data.user.id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@cyphlab.com\",\n  \"password\": \"Admin@12345\"\n}"
+            },
+            "auth": { "type": "noauth" }
+          }
+        },
+        {
+          "name": "Get Current User (Me)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/auth/me" }
+        }
+      ]
+    },
+    {
+      "name": "Users (Admin)",
+      "item": [
+        {
+          "name": "Get Pending Users",
+          "request": { "method": "GET", "url": "{{baseUrl}}/users/pending" }
+        },
+        {
+          "name": "Get All Users",
+          "request": { "method": "GET", "url": "{{baseUrl}}/users?approvedOnly=false" }
+        },
+        {
+          "name": "Approve User",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/users/{{userId}}/approve",
+            "body": { "mode": "raw", "raw": "{\n  \"role\": \"MEMBER\"\n}" }
+          }
+        },
+        {
+          "name": "Change User Role",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/users/{{userId}}/role",
+            "body": { "mode": "raw", "raw": "{\n  \"role\": \"PM\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "item": [
+        {
+          "name": "Create Project",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const data = pm.response.json();",
+                  "if (data.id) { pm.collectionVariables.set('projectId', data.id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/projects",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Lanka Trails Mobile App\",\n  \"description\": \"Phase 1 build\",\n  \"deadline\": \"2026-09-30\",\n  \"memberIds\": []\n}"
+            }
+          }
+        },
+        {
+          "name": "Get All Projects",
+          "request": { "method": "GET", "url": "{{baseUrl}}/projects" }
+        },
+        {
+          "name": "Get Project By Id",
+          "request": { "method": "GET", "url": "{{baseUrl}}/projects/{{projectId}}" }
+        },
+        {
+          "name": "Update Project",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/projects/{{projectId}}",
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"ACTIVE\"\n}" }
+          }
+        },
+        {
+          "name": "Add Members to Project",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/projects/{{projectId}}/members",
+            "body": { "mode": "raw", "raw": "{\n  \"memberIds\": [\"{{userId}}\"]\n}" }
+          }
+        },
+        {
+          "name": "Remove Member from Project",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/projects/{{projectId}}/members/{{userId}}" }
+        },
+        {
+          "name": "Delete Project",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/projects/{{projectId}}" }
+        }
+      ]
+    },
+    {
+      "name": "Tasks",
+      "item": [
+        {
+          "name": "Create Task",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const data = pm.response.json();",
+                  "if (data.id) { pm.collectionVariables.set('taskId', data.id); }"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/projects/{{projectId}}/tasks",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Design onboarding flow\",\n  \"description\": \"Wireframes + UX copy\",\n  \"priority\": \"HIGH\",\n  \"deadline\": \"2026-08-15\",\n  \"assigneeId\": null\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Tasks By Project",
+          "request": { "method": "GET", "url": "{{baseUrl}}/projects/{{projectId}}/tasks" }
+        },
+        {
+          "name": "Get My Tasks",
+          "request": { "method": "GET", "url": "{{baseUrl}}/tasks/my" }
+        },
+        {
+          "name": "Update Task (full edit)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/tasks/{{taskId}}",
+            "body": { "mode": "raw", "raw": "{\n  \"priority\": \"MEDIUM\",\n  \"assigneeId\": \"{{userId}}\"\n}" }
+          }
+        },
+        {
+          "name": "Update Task Status (Kanban)",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/tasks/{{taskId}}/status",
+            "body": { "mode": "raw", "raw": "{\n  \"status\": \"IN_PROGRESS\"\n}" }
+          }
+        },
+        {
+          "name": "Delete Task",
+          "request": { "method": "DELETE", "url": "{{baseUrl}}/tasks/{{taskId}}" }
+        }
+      ]
+    },
+    {
+      "name": "Chat",
+      "item": [
+        {
+          "name": "Get Project Messages",
+          "request": { "method": "GET", "url": "{{baseUrl}}/projects/{{projectId}}/messages" }
+        },
+        {
+          "name": "Send Message",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/projects/{{projectId}}/messages",
+            "body": { "mode": "raw", "raw": "{\n  \"content\": \"Kickoff meeting tomorrow 10am\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Activity Log",
+      "item": [
+        {
+          "name": "Get All Activities (Admin)",
+          "request": { "method": "GET", "url": "{{baseUrl}}/activities" }
+        }
+      ]
+    },
+    {
+      "name": "Analytics",
+      "item": [
+        {
+          "name": "Get Dashboard Stats",
+          "request": { "method": "GET", "url": "{{baseUrl}}/analytics/dashboard" }
+        }
+      ]
+    },
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": { "method": "GET", "url": "{{baseUrl}}/health", "auth": { "type": "noauth" } }
+        }
+      ]
+    }
+  ]
+}
